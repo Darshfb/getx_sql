@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:getx_sqflite/model/todo_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -9,6 +10,8 @@ class SQLController extends GetxController {
     createDatabase();
     super.onInit();
   }
+
+  late Database database;
 
   void createDatabase() async {
     // Get a location using getDatabasesPath
@@ -21,7 +24,6 @@ class SQLController extends GetxController {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'todo.db');
     await deleteDatabase(path);
-    print("deleted");
   }
 
   void openAppDatabase({required String path}) async {
@@ -29,21 +31,60 @@ class SQLController extends GetxController {
     await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       // When creating the db, create the table
-          // todo => is our table name / primary key increment auto
+      // todo => is our table name / primary key increment auto
       await db.execute('CREATE TABLE todo (id INTEGER PRIMARY KEY, '
           'title TEXT, description TEXT,time Text, favorite INTEGER,'
           ' completed INTEGER)');
       debugPrint("database is Created");
-    }, onOpen: (Database database) {
+    }, onOpen: (Database db) {
+      database = db;
+      getAllData();
       debugPrint("database is opened");
     });
   }
 
-  void getAllData() {}
+  List<TodoModel> list = [];
 
-  void insertData() {}
+  void getAllData() async {
+    var allData = await database.query("todo");
+    for (var i in allData) {
+      list.add(TodoModel.fromJson(i));
+    }
+    debugPrint(allData.toString());
+    update();
+  }
 
-  void updateData() {}
+  void insertData() async {
+    var insert = await database.insert("todo", {
+      "title": "go",
+      "description": "go to school",
+      "time": "10",
+      "favorite": 0,
+      "completed": 0,
+    });
+    debugPrint("$insert data inserted");
+    getAllData();
+  }
 
-  void deleteData() {}
+  void updateData() async {
+    var updateData = await database.update(
+      "todo",
+      {
+        "title": "play",
+        "description": "play football",
+        "time": "12",
+        "favorite": 1,
+        "completed": 1,
+      },
+      where: "id = ${1}",
+    );
+    debugPrint("Updated item $updateData");
+    getAllData();
+  }
+
+  void deleteData() async{
+    var deletedItem = await database.delete("todo", where: "id = ${1}");
+    debugPrint("deleted item $deletedItem");
+    getAllData();
+  }
 }
