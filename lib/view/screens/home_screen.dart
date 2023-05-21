@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_sqflite/controller/controller.dart';
+import 'package:getx_sqflite/view/screens/edit_screen.dart';
+import 'package:getx_sqflite/view/widgets/todo_item.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);
-  final controller = Get.put(SQLController());
+  final control = Get.put(SQLController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("todo App"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                controller.deleteTheDatabase();
-              },
-              icon: const Icon(Icons.remove)),
-          IconButton(
-              onPressed: () {
-                controller.insertData();
-              },
-              icon: const Icon(Icons.add)),
-        ],
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          IconButton(onPressed: () {
-            controller.updateData();
-          }, icon: const Icon(Icons.share)),
-          IconButton(onPressed: () {
-            controller.deleteData();
-          }, icon: const Icon(Icons.delete_forever)),
-        ],
-      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.to(() => EditScreen(), transition: Transition.downToUp);
+        },
+
+      child: const Icon(Icons.add)),
+      body: GetBuilder<SQLController>(
+          builder: (controller) => ListView.builder(
+                itemCount: controller.list.length,
+                itemBuilder: (context, index) =>
+                    TodoItem(controller: controller, index: index),
+              )),
     );
   }
 }
