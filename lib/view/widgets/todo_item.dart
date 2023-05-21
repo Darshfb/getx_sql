@@ -26,7 +26,9 @@ class TodoItem extends StatelessWidget {
                 Expanded(child: Text(controller.list[index].title)),
                 Expanded(child: Text(controller.list[index].time)),
               ]),
-              const SizedBox(height: 20.0,),
+              const SizedBox(
+                height: 20.0,
+              ),
               Text(controller.list[index].description),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,7 +45,12 @@ class TodoItem extends StatelessWidget {
                   IconButton(
                     onPressed: () {
                       controller.updateTaskData = true;
-                      Get.to(()=> EditScreen(id: controller.list[index].id,));
+                      Get.to(() => EditScreen(
+                            id: controller.list[index].id,
+                        title: controller.list[index].title,
+                        desc: controller.list[index].description,
+                        time: controller.list[index].time,
+                          ));
                     },
                     icon: const Icon(
                       Icons.edit,
